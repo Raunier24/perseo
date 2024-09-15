@@ -1,7 +1,7 @@
 package com.perseo.services;
 
-import com.perseo.platform.models.User;
-import com.perseo.platform.repositories.UserRepository;
+import com.perseo.models.User;
+import com.perseo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -1,11 +1,9 @@
 package com.perseo.config;
 
-import com.perseo.platform.services.AuthService;
-import com.perseo.platform.util.JwtUtil;
+import com.perseo.services.AuthService;
+import com.perseo.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;

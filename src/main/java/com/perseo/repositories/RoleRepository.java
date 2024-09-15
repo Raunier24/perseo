@@ -1,6 +1,6 @@
 package com.perseo.repositories;
 
-import com.perseo.platform.models.Role;
+import com.perseo.models.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RoleRepository extends JpaRepository<Role, Long> {
