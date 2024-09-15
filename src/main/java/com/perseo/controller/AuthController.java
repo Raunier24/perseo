@@ -35,7 +35,7 @@ public class AuthController {
 
         User user = new User();
         user.setUsername(userDTO.getUsername());
-        user.setPassword(passwordDTO.getPassword()); // Set the password from DTO
+        user.setPassword(userDTO.getPassword()); // Set the password from DTO
         user.setRole(Role.USER); // Default role is USER
 
         userService.createUser(user);

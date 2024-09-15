@@ -12,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -22,23 +24,30 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http, UserDetailsService userDetailsService, PasswordEncoder passwordEncoder)
-            throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                   .userDetailsService(userDetailsService)
-                   .passwordEncoder(passwordEncoder)
-                   .and()
-                   .build();
+    public UserDetailsService userDetailsService() {
+        return new UserService(); // El UserService implementa UserDetailsService
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                new AuthenticationManagerBuilder(http.getSharedObject(AuthenticationManagerBuilder.class));
+        authenticationManagerBuilder
+                .userDetailsService(userDetailsService())
+                .passwordEncoder(passwordEncoder());
+        return authenticationManagerBuilder.build();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-            .authorizeRequests()
-            .requestMatchers("/auth/**").permitAll()
-            .anyRequest().authenticated()
-            .and()
-            .formLogin();
+        http
+                .csrf().disable() // Deshabilitar CSRF
+                .authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests
+                                .requestMatchers("/auth/**").permitAll()
+                                .anyRequest().authenticated()
+                )
+                .formLogin(withDefaults()); // Utilizar configuración predeterminada para el inicio de sesión
 
         return http.build();
     }
