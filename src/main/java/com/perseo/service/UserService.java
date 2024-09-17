@@ -26,6 +26,7 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPassword())
@@ -47,14 +48,12 @@ public class UserService implements UserDetailsService {
     }
 
     public User updateUser(Long id, User updatedUser) {
-        Optional<User> existingUser = userRepository.findById(id);
-        if (existingUser.isPresent()) {
-            User user = existingUser.get();
-            user.setUsername(updatedUser.getUsername());
-            user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-            return userRepository.save(user);
-        }
-        return null;
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+
+        user.setUsername(updatedUser.getUsername());
+        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        return userRepository.save(user);
     }
 
     public void deleteUser(Long id) {

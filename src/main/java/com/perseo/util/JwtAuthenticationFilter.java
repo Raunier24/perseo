@@ -1,7 +1,6 @@
-package com.perseo.filter;
+package com.perseo.util;
 
 import com.perseo.service.UserService;
-import com.perseo.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,19 +14,30 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter implements ApplicationContextAware {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private UserService userService;
+    private ApplicationContext applicationContext;
+
+    // Constructor para inyección de dependencias
+    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
         final String authorizationHeader = request.getHeader("Authorization");
 
         String username = null;
@@ -41,7 +51,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Si el token es válido, procedemos con la autenticación
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userService.loadUserByUsername(username);
+            UserService userService = applicationContext.getBean(UserService.class); // Obtenemos el bean del contexto de Spring
+            UserDetails userDetails = userService.loadUserByUsername(username);
 
             // Validamos el token
             if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
